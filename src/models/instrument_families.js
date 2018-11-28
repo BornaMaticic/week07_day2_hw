@@ -1,3 +1,5 @@
+const PubSub = require('../helpers/pub_sub.js');
+
 const InstrumentFamilies = function() {
   this.instrumentFamilies = [
     {
@@ -27,5 +29,21 @@ const InstrumentFamilies = function() {
     }
   ];
 };
+
+InstrumentFamilies.prototype.bindEvents = function(){
+  PubSub.publish('Instrumentfamilies:all', this.instrumentFamilies);
+
+  PubSub.subscribe('SelectView:selected', (event) => {
+    const selectedIndex = event.detail;
+    this.publishFamilyInfo(selectedIndex);
+  });
+};
+
+InstrumentFamilies.prototype.publishFamilyInfo = function (familyIndex) {
+  const selectedFamily = this.instrumentFamilies[familyIndex];
+  PubSub.publish('InstrumentFamilies:selected-family-ready', selectedFamily)
+};
+
+
 
 module.exports = InstrumentFamilies;
